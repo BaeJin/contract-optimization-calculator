@@ -1,0 +1,22 @@
+{
+  "name": "tourlinks_calculator",
+  "version": "1.0.0",
+  "description": "",
+  "main": ".tmp-simulator-bundle.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "export:default-workbook": "node scripts/export_default_scenarios_workbook.mjs",
+    "export:default-formula-workbook": "node scripts/export_default_scenarios_formula_workbook.mjs",
+    "graph:variables": "node scripts/generate_variable_dependency_graph.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

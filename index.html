@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contract Optimization Calculator</title>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4.5' y='3.5' width='15' height='17' rx='1.2' fill='none' stroke='%230f766e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='7.2' y='7.2' width='9.6' height='3.1' rx='1.55' fill='%230f766e'/%3E%3C/svg%3E"
+    />
+    <style>
+      html,
+      body,
+      #root {
+        margin: 0;
+        min-height: 100%;
+      }
+
+      body {
+        min-width: 320px;
+        background: #020617;
+        color: #e2e8f0;
+        font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .preview-status {
+        padding: 24px;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .preview-status code {
+        background: rgba(148, 163, 184, 0.15);
+        border-radius: 6px;
+        padding: 2px 6px;
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      function loadScript(src, fallbackSrc) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement("script");
+          script.src = src;
+          script.crossOrigin = "anonymous";
+          script.onload = resolve;
+          script.onerror = () => {
+            if (!fallbackSrc) {
+              reject(new Error(`${src} 로드 실패`));
+              return;
+            }
+
+            const fallback = document.createElement("script");
+            fallback.src = fallbackSrc;
+            fallback.crossOrigin = "anonymous";
+            fallback.onload = resolve;
+            fallback.onerror = () => reject(new Error(`${src} / ${fallbackSrc} 로드 실패`));
+            document.head.appendChild(fallback);
+          };
+
+          document.head.appendChild(script);
+        });
+      }
+
+      window.__previewDepsReady = Promise.resolve()
+        .then(() =>
+          loadScript(
+            "https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js",
+            "https://unpkg.com/react@18/umd/react.development.js",
+          ),
+        )
+        .then(() =>
+          loadScript(
+            "https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js",
+            "https://unpkg.com/react-dom@18/umd/react-dom.development.js",
+          ),
+        )
+        .then(() =>
+          loadScript(
+            "https://cdn.jsdelivr.net/npm/prop-types@15.8.1/prop-types.min.js",
+            "https://unpkg.com/prop-types@15.8.1/prop-types.min.js",
+          ),
+        )
+        .then(() =>
+          loadScript(
+            "https://cdn.jsdelivr.net/npm/react-is@18/umd/react-is.production.min.js",
+            "https://unpkg.com/react-is@18/umd/react-is.production.min.js",
+          ),
+        )
+        .then(() =>
+          loadScript(
+            "https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js",
+            "https://unpkg.com/recharts@2.12.7/umd/Recharts.min.js",
+          ),
+        )
+        .then(() =>
+          loadScript(
+            "https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.10/babel.min.js",
+            "https://unpkg.com/@babel/standalone@7.26.10/babel.min.js",
+          ),
+        );
+    </script>
+  </head>
+  <body>
+    <div id="root">
+      <div class="preview-status">프리뷰를 불러오는 중...</div>
+    </div>
+    <script type="module" src="./preview-loader.js?v=7"></script>
+  </body>
+</html>
