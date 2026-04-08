@@ -1,4 +1,6 @@
-﻿const FALLBACK_USAGE_RATE = 65;
+import { buildYearlySeries } from './yearlyModel.js';
+
+const FALLBACK_USAGE_RATE = 65;
 
 function sumValues(values, pickValue = (value) => value) {
   return (values || []).reduce((total, value) => total + pickValue(value), 0);
@@ -495,43 +497,14 @@ export const formulaRegistry = {
     values.refundCost,
 
   sensitivityLtv: ({ scenario, usage, values = {} }) => {
-    let cumulativeLtv = 0;
-    let previousSurviving = 1;
-    const annualFeeRevenue = formulaRegistry.annualFeeRevenueValue({ scenario });
-    const annualFixedProfit = formulaRegistry.annualFixedProfitValue({ scenario });
+    const evaluateFormula = (key, extra = {}) =>
+      formulaRegistry[key]?.({ scenario, usage, ...extra });
 
-    for (let yearIndex = 0; yearIndex < scenario.contractYears; yearIndex += 1) {
-      const churnRate = formulaRegistry.yearChurnRate({ scenario, yearIndex });
-      const refundAmount = formulaRegistry.yearRefundAmount({ scenario, yearIndex });
-      const yearRoundingRevenue = formulaRegistry.yearRoundingRevenue({
-        scenario,
-        usage,
-        yearIndex,
-        values,
-      });
-      const enrollFeeThisYear = formulaRegistry.yearEnrollFee({ scenario, yearIndex });
-      const surviving = formulaRegistry.yearSurvivingEnd({
-        values: { prevSurviving: previousSurviving, churnRate },
-      });
-      const refundCost = formulaRegistry.yearRefundCost({
-        values: { prevSurviving: previousSurviving, churnRate, refundAmount },
-      });
-      const yearRevenue = formulaRegistry.yearRevenue({
-        values: {
-          enrollFeeThisYear,
-          annualFeeRevenue,
-          annualFixedProfit,
-          yearRoundingRevenue,
-          prevSurviving: previousSurviving,
-          refundCost,
-        },
-      });
-
-      cumulativeLtv += yearRevenue;
-      previousSurviving = surviving;
-    }
-
-    return cumulativeLtv;
+    return buildYearlySeries({
+      scenario,
+      evaluateFormula,
+      values,
+    }).cumulativeLtv;
   },
 };
 
