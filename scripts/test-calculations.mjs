@@ -1,8 +1,14 @@
 import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { calculate } from '../simulator/engine.js';
 import { defaultScenarios } from '../simulator/scenario.js';
 import { sanitizeImportedScenarios } from '../simulator/scenarioState.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const fixturesDir = path.join(__dirname, '../tests/fixtures');
 
 function approxEqual(actual, expected, epsilon = 1e-9) {
   assert.ok(
@@ -20,6 +26,72 @@ function assertIncreasing(values, label) {
 function assertDecreasing(values, label) {
   for (let index = 1; index < values.length; index += 1) {
     assert.ok(values[index] <= values[index - 1], `${label} should be non-increasing`);
+  }
+}
+
+function loadFixtures() {
+  return readdirSync(fixturesDir)
+    .filter((name) => name.endsWith('.json'))
+    .sort()
+    .map((name) => ({
+      name,
+      ...JSON.parse(readFileSync(path.join(fixturesDir, name), 'utf8')),
+    }));
+}
+
+function assertFixtureResult(fixtureName, result, expected) {
+  for (const [key, expectedValue] of Object.entries(expected)) {
+    switch (key) {
+      case 'yearRevenueByYear':
+        assert.deepEqual(
+          result.years.map((year) => year.revenueByYear),
+          expectedValue,
+          `${fixtureName}: yearRevenueByYear mismatch`,
+        );
+        break;
+      case 'cumulativeLTVByYear':
+        assert.deepEqual(
+          result.years.map((year) => year.cumulativeLTVByYear),
+          expectedValue,
+          `${fixtureName}: cumulativeLTVByYear mismatch`,
+        );
+        break;
+      case 'survivingEndByYear':
+        assert.deepEqual(
+          result.years.map((year) => year.survivingEndByYear),
+          expectedValue,
+          `${fixtureName}: survivingEndByYear mismatch`,
+        );
+        break;
+      case 'usageSensitivityFirst':
+        assert.equal(result.usageSensitivity[0].ltv, expectedValue, `${fixtureName}: usageSensitivityFirst mismatch`);
+        break;
+      case 'usageSensitivityLast':
+        assert.equal(result.usageSensitivity.at(-1).ltv, expectedValue, `${fixtureName}: usageSensitivityLast mismatch`);
+        break;
+      case 'membersSensitivityFirst':
+        assert.equal(result.membersSensitivity[0].ltv, expectedValue, `${fixtureName}: membersSensitivityFirst mismatch`);
+        break;
+      case 'membersSensitivityLast':
+        assert.equal(result.membersSensitivity.at(-1).ltv, expectedValue, `${fixtureName}: membersSensitivityLast mismatch`);
+        break;
+      case 'companionSensitivityFirst':
+        assert.equal(result.companionSensitivity[0].ltv, expectedValue, `${fixtureName}: companionSensitivityFirst mismatch`);
+        break;
+      case 'companionSensitivityLast':
+        assert.equal(result.companionSensitivity.at(-1).ltv, expectedValue, `${fixtureName}: companionSensitivityLast mismatch`);
+        break;
+      case 'customerBEP':
+        assert.equal(
+          result.customerBEP,
+          expectedValue === 'Infinity' ? Number.POSITIVE_INFINITY : expectedValue,
+          `${fixtureName}: customerBEP mismatch`,
+        );
+        break;
+      default:
+        assert.equal(result[key], expectedValue, `${fixtureName}: ${key} mismatch`);
+        break;
+    }
   }
 }
 
@@ -81,116 +153,23 @@ for (const [scenario, result] of [
   }
 }
 
-const deterministicScenario = {
-  name: 'Deterministic sanity',
-  salePrice: 100,
-  annualFee: 10,
-  annualFixedProfit: 5,
-  contractYears: 2,
-  yearlyChurnRate: 0,
-  churnByYear: [0, 0],
-  yearlyRefundAmount: 0,
-  refundAmountByYear: [0, 0],
-  regions: [
-    {
-      id: 'R1',
-      name: 'Only',
-      roundLimitByRegion: 10,
-      courseCostByRegion: 5,
-      membersByRegion: 1,
-      memberPriceByRegion: 7,
-      companionPriceByRegion: 6,
-      publicPriceByRegion: 9,
-      companionsByRegion: 1,
-    },
-  ],
-  usageByRegion: {
-    R1: [100, 100],
-  },
-};
+for (const fixture of loadFixtures()) {
+  const result = calculate(fixture.scenario);
+  assertFixtureResult(fixture.name, result, fixture.expected);
 
-const deterministicResult = calculate(deterministicScenario);
-assert.equal(deterministicResult.sumRoundLimit, 10);
-assert.equal(deterministicResult.sumActualRounds, 10);
-assert.equal(deterministicResult.wMargin, 3);
-assert.equal(deterministicResult.wSaving, 5);
-assert.equal(deterministicResult.roundingRevenue, 30);
-assert.equal(deterministicResult.annualTotal, 145);
-assert.equal(deterministicResult.totalExpectedRefundCost, 0);
-assert.equal(deterministicResult.expectedEnrollProfit, 100);
-assert.equal(deterministicResult.ltv, 190);
-assert.equal(deterministicResult.avgAnnualProfit, 95);
-assert.equal(deterministicResult.customerBEP, 24);
-assert.equal(deterministicResult.customerBEPAnnual, 12);
-assert.equal(deterministicResult.companyBEP, null);
-assert.equal(deterministicResult.expectedMaturitySurvivingRate, 100);
-assert.deepEqual(
-  deterministicResult.years.map((year) => year.revenueByYear),
-  [145, 45],
-);
-assert.deepEqual(
-  deterministicResult.years.map((year) => year.cumulativeLTVByYear),
-  [145, 190],
-);
-assert.deepEqual(
-  deterministicResult.years.map((year) => year.survivingEndByYear),
-  [100, 100],
-);
-
-const zeroUsageScenario = {
-  ...deterministicScenario,
-  name: 'Zero usage',
-  usageByRegion: { R1: [0, 0] },
-};
-const zeroUsageResult = calculate(zeroUsageScenario);
-assert.equal(zeroUsageResult.sumActualRounds, 0);
-assert.equal(zeroUsageResult.roundingRevenue, 0);
-assert.equal(zeroUsageResult.wMargin, 0);
-assert.equal(zeroUsageResult.wSaving, 0);
-assert.equal(zeroUsageResult.customerBEP, Number.POSITIVE_INFINITY);
-assert.equal(zeroUsageResult.customerNetProfit, -120);
-assert.deepEqual(
-  zeroUsageResult.years.map((year) => year.revenueByYear),
-  [115, 15],
-);
-
-const fullChurnScenario = {
-  ...deterministicScenario,
-  name: 'Full churn after year 1',
-  churnByYear: [100, 0],
-  yearlyChurnRate: 50,
-  refundAmountByYear: [30, 0],
-  yearlyRefundAmount: 15,
-};
-const fullChurnResult = calculate(fullChurnScenario);
-assert.equal(fullChurnResult.totalExpectedRefundCost, 30);
-assert.equal(fullChurnResult.expectedEnrollProfit, 70);
-assert.equal(fullChurnResult.expectedMaturitySurvivingRate, 0);
-assert.deepEqual(
-  fullChurnResult.years.map((year) => year.survivingEndByYear),
-  [0, 0],
-);
-assert.deepEqual(
-  fullChurnResult.years.map((year) => year.revenueByYear),
-  [115, 0],
-);
-assert.equal(fullChurnResult.ltv, 115);
-
-const sensitivityBase = calculate(deterministicScenario);
-assert.equal(sensitivityBase.usageSensitivity[0].ltv, 130);
-assert.equal(sensitivityBase.usageSensitivity.at(-1).ltv, 190);
-assertIncreasing(
-  sensitivityBase.usageSensitivity.map((item) => item.ltv),
-  'usageSensitivity',
-);
-assertIncreasing(
-  sensitivityBase.membersSensitivity.map((item) => item.ltv),
-  'membersSensitivity',
-);
-assertIncreasing(
-  sensitivityBase.companionSensitivity.map((item) => item.ltv),
-  'companionSensitivity',
-);
+  assertIncreasing(
+    result.usageSensitivity.map((item) => item.ltv),
+    `${fixture.name}: usageSensitivity`,
+  );
+  assertIncreasing(
+    result.membersSensitivity.map((item) => item.ltv),
+    `${fixture.name}: membersSensitivity`,
+  );
+  assertIncreasing(
+    result.companionSensitivity.map((item) => item.ltv),
+    `${fixture.name}: companionSensitivity`,
+  );
+}
 
 const [sanitized] = sanitizeImportedScenarios([
   {

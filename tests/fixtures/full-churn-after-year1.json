@@ -1,0 +1,37 @@
+{
+  "scenario": {
+    "name": "Full churn after year 1",
+    "salePrice": 100,
+    "annualFee": 10,
+    "annualFixedProfit": 5,
+    "contractYears": 2,
+    "yearlyChurnRate": 50,
+    "churnByYear": [100, 0],
+    "yearlyRefundAmount": 15,
+    "refundAmountByYear": [30, 0],
+    "regions": [
+      {
+        "id": "R1",
+        "name": "Only",
+        "roundLimitByRegion": 10,
+        "courseCostByRegion": 5,
+        "membersByRegion": 1,
+        "memberPriceByRegion": 7,
+        "companionPriceByRegion": 6,
+        "publicPriceByRegion": 9,
+        "companionsByRegion": 1
+      }
+    ],
+    "usageByRegion": {
+      "R1": [100, 100]
+    }
+  },
+  "expected": {
+    "totalExpectedRefundCost": 30,
+    "expectedEnrollProfit": 70,
+    "expectedMaturitySurvivingRate": 0,
+    "survivingEndByYear": [0, 0],
+    "yearRevenueByYear": [115, 0],
+    "ltv": 115
+  }
+}

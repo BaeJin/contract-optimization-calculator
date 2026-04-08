@@ -1,0 +1,38 @@
+{
+  "scenario": {
+    "name": "Zero usage",
+    "salePrice": 100,
+    "annualFee": 10,
+    "annualFixedProfit": 5,
+    "contractYears": 2,
+    "yearlyChurnRate": 0,
+    "churnByYear": [0, 0],
+    "yearlyRefundAmount": 0,
+    "refundAmountByYear": [0, 0],
+    "regions": [
+      {
+        "id": "R1",
+        "name": "Only",
+        "roundLimitByRegion": 10,
+        "courseCostByRegion": 5,
+        "membersByRegion": 1,
+        "memberPriceByRegion": 7,
+        "companionPriceByRegion": 6,
+        "publicPriceByRegion": 9,
+        "companionsByRegion": 1
+      }
+    ],
+    "usageByRegion": {
+      "R1": [0, 0]
+    }
+  },
+  "expected": {
+    "sumActualRounds": 0,
+    "roundingRevenue": 0,
+    "wMargin": 0,
+    "wSaving": 0,
+    "customerBEP": "Infinity",
+    "customerNetProfit": -120,
+    "yearRevenueByYear": [115, 15]
+  }
+}

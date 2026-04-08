@@ -1,0 +1,54 @@
+{
+  "scenario": {
+    "name": "Deterministic sanity",
+    "salePrice": 100,
+    "annualFee": 10,
+    "annualFixedProfit": 5,
+    "contractYears": 2,
+    "yearlyChurnRate": 0,
+    "churnByYear": [0, 0],
+    "yearlyRefundAmount": 0,
+    "refundAmountByYear": [0, 0],
+    "regions": [
+      {
+        "id": "R1",
+        "name": "Only",
+        "roundLimitByRegion": 10,
+        "courseCostByRegion": 5,
+        "membersByRegion": 1,
+        "memberPriceByRegion": 7,
+        "companionPriceByRegion": 6,
+        "publicPriceByRegion": 9,
+        "companionsByRegion": 1
+      }
+    ],
+    "usageByRegion": {
+      "R1": [100, 100]
+    }
+  },
+  "expected": {
+    "sumRoundLimit": 10,
+    "sumActualRounds": 10,
+    "wMargin": 3,
+    "wSaving": 5,
+    "roundingRevenue": 30,
+    "annualTotal": 145,
+    "totalExpectedRefundCost": 0,
+    "expectedEnrollProfit": 100,
+    "ltv": 190,
+    "avgAnnualProfit": 95,
+    "customerBEP": 24,
+    "customerBEPAnnual": 12,
+    "companyBEP": null,
+    "expectedMaturitySurvivingRate": 100,
+    "yearRevenueByYear": [145, 45],
+    "cumulativeLTVByYear": [145, 190],
+    "survivingEndByYear": [100, 100],
+    "usageSensitivityFirst": 130,
+    "usageSensitivityLast": 190,
+    "membersSensitivityFirst": 190,
+    "membersSensitivityLast": 310,
+    "companionSensitivityFirst": 170,
+    "companionSensitivityLast": 230
+  }
+}
