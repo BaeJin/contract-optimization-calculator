@@ -1,4 +1,4 @@
-import { V } from './registry';
+import { V } from './registry.js';
 
 function createMetric(key, value, extra = {}) {
   return {

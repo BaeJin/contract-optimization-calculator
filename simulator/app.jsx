@@ -1,9 +1,9 @@
-﻿import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
-import { MAX_SCENARIOS, TABS } from './constants';
-import { calculate } from './engine';
-import { fmt, fmt1 } from './formatters';
-import { fmtBEP, V } from './registry';
+import { MAX_SCENARIOS, TABS } from './constants.js';
+import { calculate } from './engine.js';
+import { fmt, fmt1 } from './formatters.js';
+import { fmtBEP, V } from './registry.js';
 import {
   addRegionToScenario,
   addScenarioItem,
@@ -17,27 +17,27 @@ import {
   updateRegionValue,
   updateScenarioValue,
   updateUsageValue,
-} from './scenarioState';
+} from './scenarioState.js';
 import {
   buildScenarioExportText,
   copyText,
   downloadJsonText,
   parseScenarioImportText,
   readJsonFile,
-} from './scenarioTransfer';
-import { ensureChurn, ensureRefundAmount, ensureUsage } from './scenario';
+} from './scenarioTransfer.js';
+import { ensureChurn, ensureRefundAmount, ensureUsage } from './scenario.js';
 import {
   getScenarioChipClass,
   getTabButtonClass,
   SIMULATOR_STYLES,
   SIMULATOR_TYPOGRAPHY,
-} from './styles';
-import { getSimulatorStyleText, getTooltipTheme, SIMULATOR_THEME } from './theme';
-import { BEPTab } from './tabs/BEPTab';
-import { CompareTab } from './tabs/CompareTab';
-import { LTVTab } from './tabs/LTVTab';
-import { InputTab } from './tabs/InputTab';
-import { SensitivityTab } from './tabs/SensitivityTab';
+} from './styles.js';
+import { getSimulatorStyleText, getTooltipTheme, SIMULATOR_THEME } from './theme.js';
+import { BEPTab } from './tabs/BEPTab.jsx';
+import { CompareTab } from './tabs/CompareTab.jsx';
+import { LTVTab } from './tabs/LTVTab.jsx';
+import { InputTab } from './tabs/InputTab.jsx';
+import { SensitivityTab } from './tabs/SensitivityTab.jsx';
 
 function ScenarioModal({
   modalMode,

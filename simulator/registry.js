@@ -1,5 +1,5 @@
-import { fmt, fmt1, fmtN } from './formatters';
-import { formulaRegistry } from './formulas';
+import { fmt, fmt1, fmtN } from './formatters.js';
+import { formulaRegistry } from './formulas.js';
 
 const roundFmt = (value) =>
   !Number.isFinite(value) || Number.isNaN(value) ? '-' : `${value.toFixed(1)}`;

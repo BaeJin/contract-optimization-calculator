@@ -1,5 +1,5 @@
-import { SIMULATOR_THEME } from "./theme";
-import { SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "./styles";
+import { SIMULATOR_THEME } from "./theme.js";
+import { SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "./styles.js";
 
 function normalizeCardValue(value, unit) {
   if (typeof value !== "string" || !unit) return value;

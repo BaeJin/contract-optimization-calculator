@@ -11,10 +11,10 @@ import {
   LineChart,
 } from 'recharts';
 
-import { buildInputDerivedState } from '../selectors';
-import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from '../styles';
-import { getDisplayLabel, getDisplayMeta } from '../text';
-import { Card, Tip } from '../ui';
+import { buildInputDerivedState } from '../selectors.js';
+import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from '../styles.js';
+import { getDisplayLabel, getDisplayMeta } from '../text.js';
+import { Card, Tip } from '../ui.jsx';
 
 function buildBepChartData(scenario, result) {
   const maxRounds = Math.max(1, Math.ceil(result.sumRoundLimit * scenario.contractYears));

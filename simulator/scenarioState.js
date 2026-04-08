@@ -1,14 +1,29 @@
-import { MAX_REGIONS, MAX_SCENARIOS } from './constants';
+import { MAX_REGIONS, MAX_SCENARIOS } from './constants.js';
 import {
+  clampNumber,
   defaultScenarios,
   ensureChurn,
   ensureRefundAmount,
   ensureUsage,
   makeRegion,
-} from './scenario';
+} from './scenario.js';
 
 function generateRegionId() {
-  return `R${String(Date.now()).padStart(13, '0')}`;
+  return `R${String(Date.now()).padStart(13, '0')}${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function normalizeRegion(region, index) {
+  return {
+    id: region?.id || generateRegionId(),
+    name: region?.name || `지역 ${index + 1}`,
+    roundLimitByRegion: clampNumber(region?.roundLimitByRegion ?? 0, { min: 0 }),
+    courseCostByRegion: Number(region?.courseCostByRegion ?? 0),
+    membersByRegion: clampNumber(region?.membersByRegion ?? 0, { min: 0 }),
+    memberPriceByRegion: Number(region?.memberPriceByRegion ?? 0),
+    companionPriceByRegion: Number(region?.companionPriceByRegion ?? 0),
+    publicPriceByRegion: Number(region?.publicPriceByRegion ?? 0),
+    companionsByRegion: clampNumber(region?.companionsByRegion ?? 0, { min: 0 }),
+  };
 }
 
 function updateScenarioAtIndex(scenarios, scenarioIndex, updater) {
@@ -70,7 +85,7 @@ export function updateUsageValue(scenarios, scenarioIndex, regionId, yearIndex, 
     const nextUsageByRegion = ensureUsage(scenario);
     const nextRegionUsage = [...(nextUsageByRegion[regionId] || [])];
 
-    nextRegionUsage[yearIndex] = value;
+    nextRegionUsage[yearIndex] = clampNumber(value, { min: 0, max: 100 });
 
     return {
       ...scenario,
@@ -86,7 +101,9 @@ export function applyUsageValueToAllYears(scenarios, scenarioIndex, regionId, va
   return updateScenarioAtIndex(scenarios, scenarioIndex, (scenario) => {
     const nextUsageByRegion = ensureUsage(scenario);
 
-    nextUsageByRegion[regionId] = Array(scenario.contractYears).fill(value);
+    nextUsageByRegion[regionId] = Array(scenario.contractYears).fill(
+      clampNumber(value, { min: 0, max: 100 }),
+    );
 
     return {
       ...scenario,
@@ -99,7 +116,7 @@ export function updateChurnValue(scenarios, scenarioIndex, yearIndex, value) {
   return updateScenarioAtIndex(scenarios, scenarioIndex, (scenario) => {
     const nextChurnByYear = [...ensureChurn(scenario)];
 
-    nextChurnByYear[yearIndex] = Math.round(value);
+    nextChurnByYear[yearIndex] = Math.round(clampNumber(value, { min: 0, max: 100 }));
 
     return {
       ...scenario,
@@ -113,7 +130,7 @@ export function updateRefundAmountValue(scenarios, scenarioIndex, yearIndex, val
   return updateScenarioAtIndex(scenarios, scenarioIndex, (scenario) => {
     const nextRefundAmountByYear = [...ensureRefundAmount(scenario)];
 
-    nextRefundAmountByYear[yearIndex] = Number(value);
+    nextRefundAmountByYear[yearIndex] = clampNumber(value, { min: 0 });
 
     return {
       ...scenario,
@@ -191,27 +208,51 @@ export function sanitizeImportedScenarios(data) {
     }
   });
 
-  return data.slice(0, MAX_SCENARIOS).map((scenario) => ({
-    ...scenario,
-    salePrice: Number(scenario.salePrice ?? 0),
-    annualFee: Number(scenario.annualFee ?? 0),
-    annualFixedProfit: Number(scenario.annualFixedProfit ?? 0),
-    contractYears: Math.max(1, Math.min(10, Number(scenario.contractYears ?? 5) || 5)),
-    yearlyChurnRate: Number(scenario.yearlyChurnRate ?? 0),
-    yearlyRefundAmount: Number(scenario.yearlyRefundAmount ?? 0),
-    churnByYear: Array.isArray(scenario.churnByYear) ? scenario.churnByYear.map(Number) : undefined,
-    refundAmountByYear: Array.isArray(scenario.refundAmountByYear)
-      ? scenario.refundAmountByYear.map(Number)
-      : undefined,
-    regions: Array.isArray(scenario.regions) ? scenario.regions.slice(0, MAX_REGIONS) : [],
-    usageByRegion:
+  return data.slice(0, MAX_SCENARIOS).map((scenario) => {
+    const contractYears = Math.max(1, Math.min(10, Number(scenario.contractYears ?? 5) || 5));
+    const regions = Array.isArray(scenario.regions)
+      ? scenario.regions.slice(0, MAX_REGIONS).map(normalizeRegion)
+      : [];
+    const normalizedUsageByRegion =
       scenario.usageByRegion && typeof scenario.usageByRegion === 'object'
         ? Object.fromEntries(
             Object.entries(scenario.usageByRegion).map(([regionId, values]) => [
               regionId,
-              Array.isArray(values) ? values.map(Number) : [],
+              Array.from({ length: contractYears }, (_, index) =>
+                clampNumber(Array.isArray(values) ? values[index] : undefined, { min: 0, max: 100 }),
+              ),
             ]),
           )
-        : {},
-  }));
+        : {};
+
+    return {
+      ...scenario,
+      name: scenario.name || 'Imported Scenario',
+      salePrice: Number(scenario.salePrice ?? 0),
+      annualFee: Number(scenario.annualFee ?? 0),
+      annualFixedProfit: Number(scenario.annualFixedProfit ?? 0),
+      contractYears,
+      yearlyChurnRate: clampNumber(scenario.yearlyChurnRate ?? 0, { min: 0, max: 100 }),
+      yearlyRefundAmount: clampNumber(scenario.yearlyRefundAmount ?? 0, { min: 0 }),
+      churnByYear: Array.from({ length: contractYears }, (_, index) =>
+        clampNumber(Array.isArray(scenario.churnByYear) ? scenario.churnByYear[index] : undefined, {
+          min: 0,
+          max: 100,
+        }),
+      ),
+      refundAmountByYear: Array.from({ length: contractYears }, (_, index) =>
+        clampNumber(
+          Array.isArray(scenario.refundAmountByYear) ? scenario.refundAmountByYear[index] : undefined,
+          { min: 0 },
+        ),
+      ),
+      regions,
+      usageByRegion: Object.fromEntries(
+        regions.map((region) => [
+          region.id,
+          normalizedUsageByRegion[region.id] ?? Array.from({ length: contractYears }, () => 100),
+        ]),
+      ),
+    };
+  });
 }

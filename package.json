@@ -1,5 +1,5 @@
 {
-  "name": "tourlinks_calculator",
+  "name": "tourlinks-calculator",
   "version": "1.0.0",
   "description": "",
   "main": ".tmp-simulator-bundle.js",
@@ -7,10 +7,12 @@
     "doc": "docs"
   },
   "scripts": {
+    "check:imports": "node scripts/check-imports.mjs",
+    "test": "node scripts/test-calculations.mjs",
+    "verify": "npm run check:imports && npm test",
     "export:default-workbook": "node scripts/export_default_scenarios_workbook.mjs",
     "export:default-formula-workbook": "node scripts/export_default_scenarios_formula_workbook.mjs",
-    "graph:variables": "node scripts/generate_variable_dependency_graph.mjs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "graph:variables": "node scripts/generate_variable_dependency_graph.mjs"
   },
   "keywords": [],
   "author": "",

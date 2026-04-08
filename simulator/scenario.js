@@ -194,6 +194,16 @@ function defaultValuesForYears(length, baseValue = 0) {
   return Array.from({ length }, () => baseValue);
 }
 
+function clampNumber(value, { min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY } = {}) {
+  const numericValue = Number(value);
+
+  if (!Number.isFinite(numericValue)) {
+    return min === Number.NEGATIVE_INFINITY ? 0 : min;
+  }
+
+  return Math.min(max, Math.max(min, numericValue));
+}
+
 function ensureUsage(scenario) {
   const length = scenario.contractYears;
   const usageByRegion = { ...scenario.usageByRegion };
@@ -205,7 +215,7 @@ function ensureUsage(scenario) {
 
       usageByRegion[region.id] = Array.from(
         { length },
-        (_, index) => previousValues[index] ?? baseValues[index],
+        (_, index) => clampNumber(previousValues[index] ?? baseValues[index], { min: 0, max: 100 }),
       );
     }
   });
@@ -226,7 +236,11 @@ function ensureChurn(scenario) {
 
   return Array.from(
     { length },
-    (_, index) => previousValues[index] ?? defaultValuesForYears(length, baseValue)[index],
+    (_, index) =>
+      clampNumber(previousValues[index] ?? defaultValuesForYears(length, baseValue)[index], {
+        min: 0,
+        max: 100,
+      }),
   );
 }
 
@@ -239,11 +253,15 @@ function ensureRefundAmount(scenario) {
 
   return Array.from(
     { length },
-    (_, index) => previousValues[index] ?? defaultValuesForYears(length, baseValue)[index],
+    (_, index) =>
+      clampNumber(previousValues[index] ?? defaultValuesForYears(length, baseValue)[index], {
+        min: 0,
+      }),
   );
 }
 
 export {
+  clampNumber,
   defaultScenarios,
   ensureChurn,
   ensureRefundAmount,

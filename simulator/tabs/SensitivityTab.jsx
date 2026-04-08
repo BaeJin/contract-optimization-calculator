@@ -1,6 +1,6 @@
-﻿import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "../styles";
-import { getDisplayLabel } from "../text";
+import { Area, CartesianGrid, ComposedChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "../styles.js";
+import { getDisplayLabel } from "../text.js";
 
 export function SensitivityTab({ result, V, fmt, tt }) {
   const charts = [

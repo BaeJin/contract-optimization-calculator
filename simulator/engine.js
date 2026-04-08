@@ -1,5 +1,5 @@
-import { V } from './registry';
-import { ensureChurn, ensureRefundAmount, ensureUsage } from './scenario';
+import { V } from './registry.js';
+import { ensureChurn, ensureRefundAmount, ensureUsage } from './scenario.js';
 
 function buildSensitivitySeries(evaluateFormula, points, buildRateLabel, buildOverrides) {
   return points.map((point) => ({

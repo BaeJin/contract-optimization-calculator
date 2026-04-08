@@ -1,5 +1,5 @@
-import { ensureUsage } from './scenario';
-import { sanitizeImportedScenarios } from './scenarioState';
+import { ensureUsage } from './scenario.js';
+import { sanitizeImportedScenarios } from './scenarioState.js';
 
 export function buildScenarioExportText(scenarios) {
   const exportPayload = scenarios.map((scenario) => ({

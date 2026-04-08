@@ -1,9 +1,9 @@
-﻿import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-import { MAX_SCENARIOS } from "../constants";
-import { ensureUsage } from "../scenario";
-import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "../styles";
-import { getDisplayLabel } from "../text";
-import { Tip } from "../ui";
+import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { MAX_SCENARIOS } from "../constants.js";
+import { ensureUsage } from "../scenario.js";
+import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "../styles.js";
+import { getDisplayLabel } from "../text.js";
+import { Tip } from "../ui.jsx";
 
 export function CompareTab({ scenarios, allResults, addScenario, V, fmt, fmtBEP, tt }) {
   const lineColors = ["#06b6d4", "#f59e0b", "#ef4444", "#8b5cf6"];

@@ -10,9 +10,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "../styles";
-import { getDisplayLabel } from "../text";
-import { Card, Tip } from "../ui";
+import { CHART_TYPOGRAPHY, SIMULATOR_STYLES, SIMULATOR_TYPOGRAPHY } from "../styles.js";
+import { getDisplayLabel } from "../text.js";
+import { Card, Tip } from "../ui.jsx";
 
 function formatTableAmount(value, fmt) {
   const formatted = fmt(value);

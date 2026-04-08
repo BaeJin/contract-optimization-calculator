@@ -1,20 +1,20 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { MAX_REGIONS } from '../constants';
-import { buildInputDerivedState } from '../selectors';
+import { MAX_REGIONS } from '../constants.js';
+import { buildInputDerivedState } from '../selectors.js';
 import {
   getUsageEditButtonClass,
   SIMULATOR_STYLES,
   SIMULATOR_TYPOGRAPHY,
-} from '../styles';
+} from '../styles.js';
 import {
   getDisplayLabel,
   getDisplayMeta,
   getDisplayPrefix,
   getDisplaySticker,
   getDisplayUnit,
-} from '../text';
-import { Tip } from '../ui';
+} from '../text.js';
+import { Tip } from '../ui.jsx';
 
 function getProfitClass(cfmt, value, fallback = SIMULATOR_TYPOGRAPHY.tableNumber) {
   if (cfmt !== 'profit') {
